@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Payment Confirmation</title>
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #ffffff;
+        color: #2f2f2f;
+        margin: 0;
+        padding: 0;
+      }
+
+      .container {
+        width: 809px;
+        height: 80%;
+        padding: 56px;
+        gap: 73.84px;
+        border-radius: 18.46px 18.46px 0 0;
+      }
+
+      .header {
+        text-align: center;
+        background-color: black;
+        color: black;
+        border-radius: 12px;
+      }
+
+      .content {
+        padding: 43px 0;
+      }
+
+      h1 {
+        font-size: 32px;
+        font-weight: 300;
+        text-align: center;
+      }
+
+      .text-approve {
+        width: 100%;
+        font-size: 48px;
+        text-align: center;
+        font-weight: 700;
+        color: black;
+      }
+
+      .message-create-password {
+        height: 130px;
+        font-size: 24px;
+        line-height: 43px;
+
+        text-align: center;
+      }
+
+      .cta-button {
+        display: block;
+        align-items: center;
+        width: 389px;
+        margin: 20px auto;
+        background-color: #f4c91d;
+        color: #000000;
+        text-align: center;
+        padding: 30px 0;
+        text-decoration: none;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 600;
+      }
+
+      .cta-button:hover {
+        background-color: #ebc62f;
+        color: #000000;
+      }
+
+      .text-link {
+        font-size: 20px;
+        line-height: 43px;
+
+        text-align: center;
+
+        a {
+          font-size: 18px;
+          line-height: 43px;
+
+          text-align: center;
+          color: #0f86db;
+        }
+      }
+
+      .text-observation {
+        background-color: #da750f26;
+        padding: 12px;
+        font-size: 18px;
+        line-height: 39px;
+        text-align: center;
+      }
+
+      .footer-content {
+        display: table;
+        width: 100%;
+      }
+
+      .info-footer {
+        display: table-cell;
+        text-align: left;
+        vertical-align: middle;
+        width: 50%;
+      }
+
+      .social-icons {
+        display: table-cell;
+        text-align: right;
+        vertical-align: middle;
+        width: 50%;
+      }
+
+      .social-icons a {
+        width: 36px;
+        height: 36px;
+        margin-left: 10px;
+      }
+
+      .social-icons img {
+        width: 36px;
+        height: 36px;
+      }
+
+      .footer {
+        font-size: 12px;
+        padding: 20px 25px;
+        border-radius: 0 0 12px 12px;
+        background-color: #171303;
+        color: #ffffff;
+      }
+
+      .footer a {
+        text-decoration: none;
+        color: #ffffff;
+      }
+      p {
+        font-weight: 300;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="header">
+        <img src="cid:logo" alt="Logo" width="258" height="120" />
+      </div>
+
+      <div class="content">
+        <h1>Olá, {{userName}}!</h1>
+        <p class="text-approve">
+          Seu pagamento foi aprovado, vamos criar sua senha de acesso?
+        </p>
+
+        <p class="message-create-password">
+          Não se preocupe, para criá-la é bem fácil. Clicando no botão abaixo
+          você será direcionado para a tela de criação de senha.
+        </p>
+
+        <a href="{{linkPassword}}" class="cta-button">Criar minha senha</a>
+
+        <p class="text-link">
+          Caso o botão não funcione, clique no link abaixo:
+        </p>
+        <p class="text-link"><a href="{{linkPassword}}">{{linkPassword}}</a></p>
+        <p class="text-observation">
+          Se este e-mail não foi direcionado a você, desconsidere esta mensagem.
+        </p>
+      </div>
+
+      <div class="footer">
+        <div class="footer-content">
+          <div class="info-footer">
+            <p>DarcioPinheiro® Brasil.</p>
+            <p>Todos os direitos reservados.</p>
+          </div>
+          <div class="social-icons">
+            <a href="#"
+              ><img
+                src="cid:instagram-icon"
+                alt="Instagram"
+                height="36px"
+                width="36px"
+            /></a>
+            <a href="#"
+              ><img
+                src="cid:youtube-icon"
+                alt="YouTube"
+                height="36px"
+                width="36px"
+            /></a>
+            <a href="#"
+              ><img
+                src="cid:linkedin-icon"
+                alt="LinkedIn"
+                height="36px"
+                width="36px"
+            /></a>
+            <a href="#"
+              ><img
+                src="cid:facebook-icon"
+                alt="Facebook"
+                height="36px"
+                width="36px"
+            /></a>
+          </div>
+        </div>
+        <p>
+          <a class="text-click" href="#">Descadastrar e-mail</a>
+        </p>
+      </div>
+    </div>
+  </body>
+</html>
