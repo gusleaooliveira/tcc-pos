@@ -26,6 +26,7 @@ import { useForm } from 'react-hook-form';
 import { useEffect, useState } from 'react';
 import { socket } from '@/services';
 import { DateTime } from 'luxon';
+import { useCommentariesByLessonId } from '../../../hooks/useCommentaries';
 
 type Props = {
   params: {
@@ -36,7 +37,8 @@ type Props = {
 export default function Lesson({ params }: Props) {
   const { user } = useAuth();
   const { data: lesson, isLoading } = useLesson(params.id);
-  const [commentaries, setCommentaries] = useState<any[]>([]);
+  const { data: commentaries, refetch } = useCommentariesByLessonId(params.id);
+  const [videoTime, setVideoTime] = useState(0); // Estado para armazenar o tempo do vídeo em segundos
 
   const mutation = useMutation({
     mutationFn: async (url: string) => {
@@ -59,10 +61,25 @@ export default function Lesson({ params }: Props) {
     },
     onSuccess: (response) => {
       toast.success('Comentário enviado com sucesso');
+      refetch();
       queryClient.invalidateQueries({ queryKey: ['commentary'] });
     },
     onError: () => {
       toast.error('Erro ao enviar comentário');
+    },
+  });
+
+  const mutationLessonProgress = useMutation({
+    mutationFn: async (data) => {
+      const response = await api.put(`/lesson-progress`, data);
+      return response.data;
+    },
+    onSuccess: (response) => {
+      console.log('Progresso:');
+      console.log(response);
+    },
+    onError: () => {
+      toast.error('Erro ao atualizar progresso da aula');
     },
   });
 
@@ -93,36 +110,14 @@ export default function Lesson({ params }: Props) {
   }, [params, user]);
 
   useEffect(() => {
-    socket.on('connect', () => {
-      console.log('Conectado ao socket');
-    });
-
-    socket.on('list-commentaries-by-lesson', (data) => {
-      console.log(data);
-
-      setCommentaries((prev) => [...prev, data]);
-    });
-
-    socket.emit('commentaries', { lesson_id: params.id });
-
-    return () => {
-      socket.disconnect();
-      socket.off('list-commentaries-by-lesson');
-      socket.off('connect');
-    };
-  }, [socket, params.id, commentaries]);
-
-  useEffect(() => {
-    socket.on('newComment', (comment) => {
-      setCommentaries((prev) => [...prev, comment]); // Adicionando o novo comentário à lista
-    });
-
-    return () => {
-      socket.off('newComment'); // Limpeza do listener
-    };
-  }, [socket]);
-
-  console.log(commentaries);
+    if (videoTime > 0) {
+      mutationLessonProgress.mutate({
+        user_id: user?.id,
+        lesson_id: params?.id,
+        time: videoTime,
+      });
+    }
+  }, [videoTime, params?.id, user?.id]);
 
   if (isLoading) return <Text>Carregando...</Text>;
 
@@ -143,6 +138,10 @@ export default function Lesson({ params }: Props) {
           }}
           controls
           poster={lesson?.thumbnail?.url}
+          onTimeUpdate={(e) => {
+            const videoElement = e.target;
+            setVideoTime(videoElement.currentTime); // Atualiza o estado com o tempo atual do vídeo em segundos
+          }}
         >
           <source src={lesson?.video.url} />
         </video>
@@ -332,18 +331,54 @@ export default function Lesson({ params }: Props) {
               </form>
             </Box>
             <Box>
-              {!!lesson?.commentaries &&
-                lesson?.commentaries.map((comentary) => (
-                  <Box>
+              {!!commentaries &&
+                commentaries.map((comentary) => (
+                  <Box
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      gap: 8,
+                      marginTop: 16,
+                      marginRight: 12,
+                    }}
+                  >
                     <Box>
                       <Avatar
                         style={{ width: 48, height: 48 }}
-                        src={comentary?.user?.avatar.url}
+                        src={comentary?.user_id?.avatar?.url}
                       />
                     </Box>
-                    <Box>
-                      <Text>{comentary?.user?.name}</Text>
-                      <Text>{comentary?.commentary}</Text>
+                    <Box
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 4,
+                        borderRadius: 12,
+                        padding: 16,
+                        backgroundColor: '#0d0d0d',
+                        width: 714,
+                        maxWidth: 714,
+                        height: 121,
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontWeight: 500,
+                          fontSize: 14,
+                        }}
+                      >
+                        {comentary?.user_id?.name}
+                      </Text>
+                      <Text
+                        style={{
+                          textWrap: 'wrap',
+                          textAlign: 'justify',
+                          fontSize: 16,
+                          fontWeight: 300,
+                        }}
+                      >
+                        {comentary?.commentary}
+                      </Text>
                     </Box>
                   </Box>
                 ))}
