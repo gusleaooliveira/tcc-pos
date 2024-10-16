@@ -11,11 +11,14 @@ import {
   Text,
 } from '@mantine/core';
 import {
+  IconCheck,
   IconDots,
   IconDownload,
+  IconFileLike,
   IconPoint,
   IconPointFilled,
   IconSend,
+  IconThumbUp,
 } from '@tabler/icons-react';
 import { useMutation } from '@tanstack/react-query';
 import { api, apiDarcio, queryClient } from '@/services';
@@ -138,6 +141,7 @@ export default function Lesson({ params }: Props) {
           style={{
             width: 1243,
             height: 670,
+            borderRadius: 12,
           }}
           controls
           poster={lesson?.thumbnail?.url}
@@ -152,55 +156,73 @@ export default function Lesson({ params }: Props) {
       <Box
         style={{
           width: 1243,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 16,
+          paddingRight: 23,
         }}
       >
         <Box
           style={{
             display: 'flex',
             flexDirection: 'row',
-            alignItems: 'center',
-            gap: 8,
+            justifyContent: 'space-between',
+            gap: 16,
           }}
         >
-          <Text
+          <Box
             style={{
-              color: '#f4c91d',
-              fontWeight: 300,
-              textTransform: 'uppercase',
-              fontSize: 16,
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 8,
             }}
           >
-            {lesson?.module.title}
-          </Text>
-          <IconPointFilled style={{ width: 8, height: 8 }} />
-          <Badge
-            color="#C09D111A"
-            radius="sm"
-            style={{ fontSize: 16, fontWeight: 400 }}
-          >
-            Aula de
-          </Badge>
-          <IconPointFilled style={{ width: 8, height: 8 }} />
-          <Text
-            style={{
-              fontSize: 14,
-              fontWeight: 300,
-            }}
-          >
-            Publicado em{' '}
-          </Text>
-          <Text
-            style={{
-              fontSize: 14,
-              fontWeight: 600,
-            }}
-          >
-            {!!lesson?.module?.created_at
-              ? DateTime.fromISO(
-                  lesson?.module?.created_at.toString(),
-                ).toFormat('dd/MM/yyyy')
-              : ''}
-          </Text>
+            <Text
+              style={{
+                color: '#f4c91d',
+                fontWeight: 300,
+                textTransform: 'uppercase',
+                fontSize: 16,
+              }}
+            >
+              {lesson?.module.title}
+            </Text>
+            <IconPointFilled style={{ width: 8, height: 8 }} />
+            <Badge
+              color="#C09D111A"
+              radius="sm"
+              style={{ fontSize: 16, fontWeight: 400 }}
+            >
+              Aula de
+            </Badge>
+            <IconPointFilled style={{ width: 8, height: 8 }} />
+            <Text
+              style={{
+                fontSize: 14,
+                fontWeight: 300,
+              }}
+            >
+              Publicado em{' '}
+            </Text>
+            <Text
+              style={{
+                fontSize: 14,
+                fontWeight: 600,
+              }}
+            >
+              {!!lesson?.module?.created_at
+                ? DateTime.fromISO(
+                    lesson?.module?.created_at.toString(),
+                  ).toFormat('dd/MM/yyyy')
+                : ''}
+            </Text>
+          </Box>
+          <Box>
+            <ActionIcon>
+              <IconThumbUp />
+            </ActionIcon>
+          </Box>
         </Box>
         <Box>
           <Text
