@@ -69,20 +69,6 @@ export default function Lesson({ params }: Props) {
     },
   });
 
-  const mutationLessonProgress = useMutation({
-    mutationFn: async (data) => {
-      const response = await api.put(`/lesson-progress`, data);
-      return response.data;
-    },
-    onSuccess: (response) => {
-      console.log('Progresso:');
-      console.log(response);
-    },
-    onError: () => {
-      toast.error('Erro ao atualizar progresso da aula');
-    },
-  });
-
   const onSubmit = (data: any) => {
     console.log(data);
     mutationCommentary.mutate(data);
@@ -110,14 +96,31 @@ export default function Lesson({ params }: Props) {
   }, [params, user]);
 
   useEffect(() => {
+    socket.on('connect', () => {
+      console.log('Conectado ao servidor');
+    });
+
+    socket.on('updateLessonProgressResponse', (data) => {
+      console.log(data);
+    });
+
+    return () => {
+      socket.off('updateLessonProgressResponse');
+      socket.off('connect');
+    };
+  }, [socket]);
+
+  useEffect(() => {
     if (videoTime > 0) {
-      mutationLessonProgress.mutate({
+      socket.emit('updateLessonProgress', {
         user_id: user?.id,
         lesson_id: params?.id,
         time: videoTime,
       });
     }
   }, [videoTime, params?.id, user?.id]);
+
+  console.log(lesson);
 
   if (isLoading) return <Text>Carregando...</Text>;
 
@@ -139,7 +142,7 @@ export default function Lesson({ params }: Props) {
           controls
           poster={lesson?.thumbnail?.url}
           onTimeUpdate={(e) => {
-            const videoElement = e.target;
+            const videoElement = e.target as HTMLVideoElement;
             setVideoTime(videoElement.currentTime); // Atualiza o estado com o tempo atual do vídeo em segundos
           }}
         >
@@ -341,6 +344,7 @@ export default function Lesson({ params }: Props) {
                       marginTop: 16,
                       marginRight: 12,
                     }}
+                    key={comentary.id}
                   >
                     <Box>
                       <Avatar
