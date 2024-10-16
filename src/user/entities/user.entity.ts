@@ -3,6 +3,7 @@ import { Address } from 'src/address/entities/address.entity';
 import { Commentary } from 'src/commentary/entities/commentary.entity';
 import { Image } from 'src/image/entities/image.entity';
 import { LessonProgress } from 'src/lesson-progress/entities/lesson-progress.entity';
+import { LessonRating } from 'src/lesson-rating/entities/lesson-rating.entity';
 import { SocialMedia } from 'src/social-media/entities/social-media.entity';
 import {
   Column,
@@ -89,6 +90,9 @@ export class User {
 
   @OneToMany(() => LessonProgress, (lessonProgress) => lessonProgress.user_id)
   lession_progress: LessonProgress[];
+
+  @OneToMany(() => LessonRating, (lessonRating) => lessonRating.user_id)
+  lesson_rating: LessonRating[];
 
   @CreateDateColumn()
   created_at: Date;

@@ -14,11 +14,11 @@ export class LessonRating {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => Lesson)
+  @ManyToOne(() => Lesson, (lesson) => lesson.lesson_rating)
   @JoinColumn({ name: 'lesson_id' })
   lesson_id: Lesson;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, (user) => user.lesson_rating)
   @JoinColumn({ name: 'user_id' })
   user_id: User;
 

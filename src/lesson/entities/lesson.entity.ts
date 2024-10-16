@@ -2,6 +2,7 @@ import { Commentary } from 'src/commentary/entities/commentary.entity';
 import { Document } from 'src/document/entities/document.entity';
 import { Image } from 'src/image/entities/image.entity';
 import { LessonProgress } from 'src/lesson-progress/entities/lesson-progress.entity';
+import { LessonRating } from 'src/lesson-rating/entities/lesson-rating.entity';
 import { Module } from 'src/module/entities/module.entity';
 import { Video } from 'src/video/entities/video.entity';
 import {
@@ -92,4 +93,7 @@ export class Lesson {
 
   @OneToMany(() => Commentary, (commentary) => commentary.lesson_id)
   commentaries: Commentary[];
+
+  @OneToMany(() => LessonRating, (lessonRating) => lessonRating.lesson_id)
+  lesson_rating: LessonRating[];
 }
