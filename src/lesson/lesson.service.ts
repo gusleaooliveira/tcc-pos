@@ -93,7 +93,7 @@ export class LessonService {
       .leftJoinAndSelect('lesson.video', 'video')
       .leftJoinAndSelect('lesson.module', 'module')
       .leftJoinAndSelect('lesson.commentaries', 'commentaries')
-      .leftJoinAndSelect('commentaries.user', 'user')
+      .leftJoinAndSelect('commentaries.user_id', 'user')
       .leftJoinAndSelect('user.avatar', 'avatar')
       .getMany();
   }
@@ -130,7 +130,7 @@ export class LessonService {
       .leftJoinAndSelect('lesson.video', 'video')
       .leftJoinAndSelect('lesson.module', 'module')
       .leftJoinAndSelect('lesson.commentaries', 'commentaries')
-      .leftJoinAndSelect('commentaries.user', 'user')
+      .leftJoinAndSelect('commentaries.user_id', 'user')
       .leftJoinAndSelect('user.avatar', 'avatar')
       .where('lesson.id = :id', { id })
       .getOne();
@@ -198,7 +198,7 @@ export class LessonService {
       .leftJoinAndSelect('lesson.video', 'video')
       .leftJoinAndSelect('lesson.module', 'module')
       .leftJoinAndSelect('lesson.commentaries', 'commentaries')
-      .leftJoinAndSelect('commentaries.user', 'user')
+      .leftJoinAndSelect('commentaries.user_id', 'user')
       .leftJoinAndSelect('user.avatar', 'avatar')
       .where('lesson.id = :id', { id })
       .getOne();

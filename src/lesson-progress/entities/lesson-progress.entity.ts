@@ -14,16 +14,19 @@ export class LessonProgress {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, (user) => user.lession_progress)
   @JoinColumn({ name: 'user_id' })
   user_id: User;
 
-  @ManyToOne(() => Lesson)
+  @ManyToOne(() => Lesson, (lesson) => lesson.lessons_progress)
   @JoinColumn({ name: 'lesson_id' })
   lesson_id: Lesson;
 
-  @Column()
+  @Column({ nullable: true, default: 0})
   percentage_completed: number;
+
+  @Column({ nullable: true, default: 0, type: 'float' })
+  time: number;
 
   @UpdateDateColumn()
   updated_at: Date;

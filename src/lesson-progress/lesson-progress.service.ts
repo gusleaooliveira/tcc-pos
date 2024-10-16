@@ -21,19 +21,19 @@ export class LessonProgressService {
     private readonly userService: UserService,
 
     @Inject(forwardRef(() => LessonService))
-    private readonly lessonService: LessonService
+    private readonly lessonService: LessonService,
   ) {}
 
-  async createOrUpdate(createLessonProgressDto: CreateLessonProgressDto) {
+  async createOrUpdate(createLessonProgressDto: any) {
     const lesson = await this.findOneByLessonAndUser(
       createLessonProgressDto.lesson_id,
-      createLessonProgressDto.user_id
+      createLessonProgressDto.user_id,
     );
 
     if (!!lesson) {
       const data = {
         ...lesson,
-        percentage_completed: createLessonProgressDto.percentage_completed,
+        time: createLessonProgressDto.time,
       };
       await this.update(lesson.id, data);
     } else {
@@ -65,7 +65,7 @@ export class LessonProgressService {
         {
           lesson_id,
           user_id,
-        }
+        },
       )
       .getOne();
 
@@ -74,10 +74,10 @@ export class LessonProgressService {
 
   async create(createLessonProgressDto: CreateLessonProgressDto) {
     const user = await this.userService.findOne(
-      createLessonProgressDto.user_id
+      createLessonProgressDto.user_id,
     );
     const lesson = await this.lessonService.findOne(
-      createLessonProgressDto.lesson_id
+      createLessonProgressDto.lesson_id,
     );
 
     const data = {
@@ -110,6 +110,14 @@ export class LessonProgressService {
 
   async update(id: string, updateLessonProgressDto: any) {
     await this.lessonProgressRepository.update(id, updateLessonProgressDto);
+  }
+
+  async updateLessonProgress(lesson_id: string, updateLessonProgressDto: any) {
+    await this.lessonProgressRepository.update(
+      lesson_id,
+      updateLessonProgressDto,
+    );
+    return await this.findOneByLesson(lesson_id);
   }
 
   async remove(id: string): Promise<{ message: string }> {

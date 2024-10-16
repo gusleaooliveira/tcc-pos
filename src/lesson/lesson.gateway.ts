@@ -60,4 +60,19 @@ export class LessonGateway implements OnGatewayConnection, OnGatewayDisconnect {
       `Progresso: ${dt.percentage_completed}`,
     );
   }
+
+  @SubscribeMessage('updateLessonProgress')
+  async handleUpdateLessonProgress(client: Socket, @MessageBody() data: any) {
+    this.lessonProgressService.createOrUpdate(data);
+    const { time } = data;
+    this.server.emit('updateLessonProgressResponse', `Tempo: ${time}`);
+  }
+
+  @SubscribeMessage('updateLessonProgressResponse')
+  async handleUpdateLessonProgressResponse(
+    client: Socket,
+    @MessageBody() data: any,
+  ) {
+    this.server.emit('updateLessonProgressResponse', data);
+  }
 }

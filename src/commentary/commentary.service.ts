@@ -12,7 +12,7 @@ export class CommentaryService {
     private readonly commentaryRepository: Repository<Commentary>,
   ) {}
 
-  async create(createCommentaryDto: CreateCommentaryDto): Promise<Commentary> {
+  async create(createCommentaryDto: any) {
     const commentary = this.commentaryRepository.create(createCommentaryDto);
     return await this.commentaryRepository.save(commentary);
   }
@@ -24,7 +24,8 @@ export class CommentaryService {
   async findAllByLesson(lesson_id: string): Promise<Commentary[]> {
     return await this.commentaryRepository
       .createQueryBuilder('commentary')
-      .leftJoinAndSelect('commentary.user', 'user')
+      .leftJoinAndSelect('commentary.user_id', 'user')
+      .leftJoinAndSelect('user.avatar', 'avatar')
       .where('commentary.lesson_id = :lesson_id', { lesson_id })
       .getMany();
   }
@@ -37,13 +38,9 @@ export class CommentaryService {
     return commentary;
   }
 
-  async update(
-    id: string,
-    updateCommentaryDto: UpdateCommentaryDto,
-  ): Promise<Commentary> {
+  async update(id: string, updateCommentaryDto: any): Promise<Commentary> {
     await this.commentaryRepository.update(id, updateCommentaryDto);
-    const updatedCommentary = await this.findOne(id);
-    return updatedCommentary;
+    return await this.findOne(id);
   }
 
   async remove(id: string): Promise<{ message: string }> {

@@ -1,6 +1,8 @@
 import * as bcrypt from 'bcrypt';
-import { Address } from 'src/address/entities/address.entity'; 
+import { Address } from 'src/address/entities/address.entity';
+import { Commentary } from 'src/commentary/entities/commentary.entity';
 import { Image } from 'src/image/entities/image.entity';
+import { LessonProgress } from 'src/lesson-progress/entities/lesson-progress.entity';
 import { SocialMedia } from 'src/social-media/entities/social-media.entity';
 import {
   Column,
@@ -8,6 +10,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -21,24 +24,24 @@ export class User {
   @Column({ nullable: true })
   email: string;
 
-  @Column()
+  @Column({ nullable: true })
   name: string;
 
-  @Column()
+  @Column({ nullable: true })
   last_name: string;
 
-  @Column()
+  @Column({ nullable: true })
   phone: string;
 
   @Column({ nullable: true })
   password: string;
 
-  @Column({ type: 'text' })
+  @Column({ nullable: true })
   description: string;
 
-  @Column()
+  @Column({ nullable: true })
   cpf: string;
- 
+
   @Column({ nullable: true, default: null })
   gender: string;
 
@@ -80,6 +83,12 @@ export class User {
 
   @Column({ default: 0, nullable: true })
   total_progress: number;
+
+  @OneToMany(() => Commentary, (commentary) => commentary.user_id)
+  commentaries: Commentary[];
+
+  @OneToMany(() => LessonProgress, (lessonProgress) => lessonProgress.user_id)
+  lession_progress: LessonProgress[];
 
   @CreateDateColumn()
   created_at: Date;

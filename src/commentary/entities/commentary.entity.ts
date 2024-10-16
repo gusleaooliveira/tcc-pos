@@ -19,15 +19,13 @@ export class Commentary {
   @Column({ type: 'text' })
   commentary: string;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, (user) => user.commentaries)
   @JoinColumn({ name: 'user_id' })
-  user: User;
+  user_id: User;
 
-  @ManyToOne(() => Lesson, (lesson) => lesson.commentaries, {
-    onDelete: 'CASCADE',
-  })
+  @ManyToOne(() => Lesson, (lesson) => lesson.commentaries)
   @JoinColumn({ name: 'lesson_id' })
-  lesson: Lesson;
+  lesson_id: Lesson;
 
   @CreateDateColumn()
   created_at: Date;

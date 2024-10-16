@@ -27,6 +27,12 @@ export class CommentaryController {
     return this.commentaryService.create(createCommentaryDto);
   }
 
+  @Get('/lesson/:lesson_id')
+  @ApiOperation({ summary: 'Get all commentaryes by lesson' })
+  findAllByLesson(@Param('lesson_id') lesson_id: string) {
+    return this.commentaryService.findAllByLesson(lesson_id);
+  }
+
   @Get()
   @ApiOperation({ summary: 'Get all commentaryes' })
   findAll() {
@@ -43,7 +49,7 @@ export class CommentaryController {
   @ApiOperation({ summary: 'Update an commentary' })
   update(
     @Param('id') id: string,
-    @Body() updateCommentaryDto: UpdateCommentaryDto
+    @Body() updateCommentaryDto: UpdateCommentaryDto,
   ) {
     return this.commentaryService.update(id, updateCommentaryDto);
   }

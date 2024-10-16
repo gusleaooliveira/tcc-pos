@@ -1,6 +1,7 @@
 import { Commentary } from 'src/commentary/entities/commentary.entity';
 import { Document } from 'src/document/entities/document.entity';
 import { Image } from 'src/image/entities/image.entity';
+import { LessonProgress } from 'src/lesson-progress/entities/lesson-progress.entity';
 import { Module } from 'src/module/entities/module.entity';
 import { Video } from 'src/video/entities/video.entity';
 import {
@@ -86,6 +87,9 @@ export class Lesson {
   @UpdateDateColumn()
   updated_at: Date;
 
-  @OneToMany(() => Commentary, (commentary) => commentary.lesson)
+  @OneToMany(() => LessonProgress, (lessonProgress) => lessonProgress.lesson_id)
+  lessons_progress: LessonProgress[];
+
+  @OneToMany(() => Commentary, (commentary) => commentary.lesson_id)
   commentaries: Commentary[];
 }

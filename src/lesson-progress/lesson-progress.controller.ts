@@ -46,13 +46,23 @@ export class LessonProgressController {
     return this.lessonProgressService.findOne(id);
   }
 
+  @Put()
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update an lessonProgress' })
+  updateLessonProgress(
+    @Body() createLessonProgressDto: CreateLessonProgressDto,
+  ) {
+    return this.lessonProgressService.createOrUpdate(createLessonProgressDto);
+  }
+
   @Put(':id')
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update an lessonProgress' })
   update(
     @Param('id') id: string,
-    @Body() updateLessonProgressDto: UpdateLessonProgressDto
+    @Body() updateLessonProgressDto: UpdateLessonProgressDto,
   ) {
     return this.lessonProgressService.update(id, updateLessonProgressDto);
   }
