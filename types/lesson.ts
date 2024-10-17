@@ -1,3 +1,5 @@
+import { User } from "./user";
+
 export interface Thumbnail {
   id: string;
   title: string;
@@ -38,6 +40,14 @@ export interface Module {
   updated_at: string;
 }
 
+export interface LessonProgress {
+  id: string;
+  time: number;
+  percentage_completed: number;
+  lesson_id: Lesson;
+  user_id: User;
+}
+
 export interface Lesson {
   id: string;
   title: string;
@@ -53,6 +63,7 @@ export interface Lesson {
   miniature: Miniature;
   complementary_materials: ComplementaryMaterial[];
   video: Video;
+  lession_progress: LessonProgress | null;
   module: Module;
   commentaries: any[]; // Ajuste o tipo conforme necessário
 }

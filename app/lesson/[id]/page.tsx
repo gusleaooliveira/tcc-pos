@@ -17,6 +17,7 @@ import {
   IconCheck,
   IconDots,
   IconDownload,
+  IconFile,
   IconFileLike,
   IconPoint,
   IconPointFilled,
@@ -557,12 +558,16 @@ export default function Lesson({ params }: Props) {
                   }}
                 >
                   <Box>
+                  {lesson?.miniature?.url ? (
                     <Image
                       src={lesson?.miniature?.url}
                       width={134}
                       height={127}
                       alt="thumbnail"
                     />
+                  ) : (
+                    <IconFile />
+                  )}
                   </Box>
                   <Box
                     style={{
@@ -606,7 +611,12 @@ export default function Lesson({ params }: Props) {
                       }}
                     >
                       <Text>{formatVideoTime(lesson.duration)}</Text>
-                      <IconPointFilled style={{ width: 8, height: 8 }} />
+                      {lesson?.lession_progress?.percentage_completed ? 
+                      <>
+                        <IconPointFilled style={{ width: 8, height: 8 }} />  
+                        <Text>{lesson?.lession_progress?.percentage_completed}%</Text>
+                      </>
+                      : ''}
                     </Box>
                   </Box>
                 </Box>
