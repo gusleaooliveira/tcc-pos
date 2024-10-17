@@ -118,6 +118,67 @@ export class LessonService {
     return lessonsExists;
   }
 
+  async findOneToFront(id: string, queries: { user_id?: string }) {
+    const { user_id } = queries;
+
+    let lesson = await this.lessonRepository
+      .createQueryBuilder('lesson')
+      .leftJoinAndSelect('lesson.thumbnail', 'thumbnail')
+      .leftJoinAndSelect('lesson.miniature', 'miniature')
+      .leftJoinAndSelect(
+        'lesson.complementary_materials',
+        'complementary_materials',
+      )
+      .leftJoinAndSelect('lesson.video', 'video')
+      .leftJoinAndSelect('lesson.module', 'module')
+      .leftJoinAndSelect('lesson.commentaries', 'commentaries')
+      .leftJoinAndSelect('commentaries.user_id', 'user')
+      .leftJoinAndSelect('user.avatar', 'avatar')
+      .where('lesson.id = :id', { id });
+
+    if (!!user_id) {
+      lesson.andWhere('user.id = :user_id', { user_id });
+    }
+
+    const resp = await lesson.getOne();
+
+    if (!resp) {
+      throw new NotFoundException(`Lesson with ID ${id} not found`);
+    }
+
+    const rating = await this.lessonRatingService.findByLessonAndUser(
+      id,
+      user_id,
+    );
+    const like = await this.lessonLikesService.findByLessonAndUser(id, user_id);
+    const likes_count = await this.lessonLikesService.findByLessonAndCount(id);
+    const time_read = await this.lessonProgressService.findOneByLessonAndUser(
+      id,
+      user_id,
+    );
+
+    let response: any = {
+      ...resp,
+    };
+
+    if (!!rating) {
+      response = { ...response, commentaries: rating };
+    }
+    if (!!like) {
+      response = { ...response, like: like };
+    }
+    if (!!likes_count) {
+      response = { ...response, count_likes: likes_count };
+    }
+    if (!!time_read) {
+      response = { ...response, time_read: time_read };
+    }
+
+    console.log(response);
+
+    return response;
+  }
+
   async findOne(id: string): Promise<Lesson> {
     const lesson = await this.lessonRepository
       .createQueryBuilder('lesson')

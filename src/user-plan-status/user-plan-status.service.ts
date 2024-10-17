@@ -22,12 +22,32 @@ export class UserPlanStatusService {
   }
 
   async createByWebhook(userId: string, planId: string): Promise<UserPlanStatus> {
+
+    const user = await this.findOneByUserIdAndPlanId(userId, planId);
+
+    if(user){
+        await  this.userPlanStatusRepository.update({
+        user: { id: userId },
+        plan: { id: planId },
+       }, {
+        status: 'active',
+       });
+       return await this.findOneByUserIdAndPlanId(userId, planId)
+    }
+
     const userPlanStatus = this.userPlanStatusRepository.create({
       user: { id: userId },
       plan: { id: planId },
       status: 'active',
     });
     return await this.userPlanStatusRepository.save(userPlanStatus);
+  }
+
+
+  async findOneByUserIdAndPlanId(userId: string, planId: string) {
+    return await this.userPlanStatusRepository.findOne({
+      where: { user: { id: userId }, plan: { id: planId } },
+    });
   }
 
 

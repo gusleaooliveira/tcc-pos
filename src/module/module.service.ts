@@ -11,7 +11,7 @@ export class ModuleService {
   constructor(
     @InjectRepository(Module)
     private readonly moduleRepository: Repository<Module>,
-    private readonly lessonService: LessonService
+    private readonly lessonService: LessonService,
   ) {}
 
   async create(createModuleDto: CreateModuleDto): Promise<Module> {
@@ -47,7 +47,7 @@ export class ModuleService {
       .leftJoinAndSelect('lessons.miniature', 'miniature')
       .leftJoinAndSelect(
         'lessons.complementary_materials',
-        'complementary_materials'
+        'complementary_materials',
       )
       .getMany();
   }
@@ -61,7 +61,7 @@ export class ModuleService {
       .leftJoinAndSelect('lessons.miniature', 'miniature')
       .leftJoinAndSelect(
         'lessons.complementary_materials',
-        'complementary_materials'
+        'complementary_materials',
       )
       .getMany();
   }
@@ -75,7 +75,26 @@ export class ModuleService {
       .leftJoinAndSelect('lessons.miniature', 'miniature')
       .leftJoinAndSelect(
         'lessons.complementary_materials',
-        'complementary_materials'
+        'complementary_materials',
+      )
+      .where('module.id = :id', { id })
+      .getOne();
+    if (!module) {
+      throw new NotFoundException(`Module with ID ${id} not found`);
+    }
+    return module;
+  }
+
+  async findAllLessonsByModuleId(id: string) {
+    const module = await this.moduleRepository
+      .createQueryBuilder('module')
+      .leftJoinAndSelect('module.lessons', 'lessons')
+      .leftJoinAndSelect('lessons.video', 'video')
+      .leftJoinAndSelect('lessons.thumbnail', 'thumbnail')
+      .leftJoinAndSelect('lessons.miniature', 'miniature')
+      .leftJoinAndSelect(
+        'lessons.complementary_materials',
+        'complementary_materials',
       )
       .where('module.id = :id', { id })
       .getOne();
@@ -87,7 +106,7 @@ export class ModuleService {
 
   async update(id: string, updateModuleDto: UpdateModuleDto): Promise<Module> {
     const lessons = await this.lessonService.findManyIfNotExistsCreate(
-      updateModuleDto.lessons
+      updateModuleDto.lessons,
     );
     const data = {
       ...updateModuleDto,

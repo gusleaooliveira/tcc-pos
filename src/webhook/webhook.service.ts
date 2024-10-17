@@ -1,5 +1,6 @@
 import { HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { AuthService } from 'src/auth/auth.service';
 import { PlanService } from 'src/plan/plan.service';
 import { SendEmailService } from 'src/send-email/send-email.service';
 import { UserPlanStatusService } from 'src/user-plan-status/user-plan-status.service';
@@ -16,26 +17,40 @@ export class WebhookService {
     private readonly userService: UserService,
     private readonly planService: PlanService,
     private readonly userPlanStatusService: UserPlanStatusService,
-    private readonly sendEmailService: SendEmailService
+    private readonly sendEmailService: SendEmailService,
+    private readonly authService: AuthService
   ) {
     this.stripe = new Stripe(this.configService.get('STRIPE_SECRET_KEY'), {
       apiVersion: '2024-09-30.acacia',
-    }); 
+    });
 
     this.logger.log('WebhookService iniciado com sucesso');
-    this.logger.debug(`Stripe Secret Key: ${this.configService.get('STRIPE_SECRET_KEY')}`);
-    this.logger.debug(`Stripe Webhook Secret: ${this.configService.get('STRIPE_WEBHOOK_SECRET')}`);
+    this.logger.debug(
+      `Stripe Secret Key: ${this.configService.get('STRIPE_SECRET_KEY')}`
+    );
+    this.logger.debug(
+      `Stripe Webhook Secret: ${this.configService.get('STRIPE_WEBHOOK_SECRET')}`
+    );
   }
 
-  async constructEvent(rawBody: Buffer, signature: string): Promise<Stripe.Event> {
-    const endpointSecret = this.configService.get<string>('STRIPE_WEBHOOK_SECRET');
+  async constructEvent(
+    rawBody: Buffer,
+    signature: string
+  ): Promise<Stripe.Event> {
+    const endpointSecret = this.configService.get<string>(
+      'STRIPE_WEBHOOK_SECRET'
+    );
     this.logger.log('Tentando construir evento Stripe');
     this.logger.debug(`Tamanho do corpo: ${rawBody.length}`);
     this.logger.debug(`Assinatura: ${signature}`);
     this.logger.debug(`Segredo do endpoint: ${endpointSecret}`);
-    
+
     try {
-      const event = this.stripe.webhooks.constructEvent(rawBody, signature, endpointSecret);
+      const event = this.stripe.webhooks.constructEvent(
+        rawBody,
+        signature,
+        endpointSecret
+      );
       this.logger.log(`Evento Stripe construído com sucesso: ${event.type}`);
       return event;
     } catch (err) {
@@ -58,22 +73,32 @@ export class WebhookService {
           await this.handlePriceEvent(event.data.object as Stripe.Price);
           break;
         case 'product.deleted':
-          await this.handleProductDeletedEvent(event.data.object as Stripe.Product);
+          await this.handleProductDeletedEvent(
+            event.data.object as Stripe.Product
+          );
           break;
         case 'customer.subscription.created':
-          await this.handleSubscriptionCreatedEvent(event.data.object as Stripe.Subscription);
+          await this.handleSubscriptionCreatedEvent(
+            event.data.object as Stripe.Subscription
+          );
           break;
         case 'invoice.payment_succeeded':
-          await this.handleInvoicePaymentSucceededEvent(event.data.object as Stripe.Invoice);
+          await this.handleInvoicePaymentSucceededEvent(
+            event.data.object as Stripe.Invoice
+          );
           break;
         default:
           this.logger.warn(`Evento não tratado: ${event.type}`);
       }
       this.logger.log(`Evento ${event.type} processado com sucesso`);
     } catch (error) {
-      this.logger.error(`Erro ao processar evento ${event.type}: ${error.message}`);
+      this.logger.error(
+        `Erro ao processar evento ${event.type}: ${error.message}`
+      );
       this.logger.debug(`Detalhes do erro: ${JSON.stringify(error, null, 2)}`);
-      this.logger.debug(`Dados do evento: ${JSON.stringify(event.data.object, null, 2)}`);
+      this.logger.debug(
+        `Dados do evento: ${JSON.stringify(event.data.object, null, 2)}`
+      );
     }
   }
 
@@ -95,27 +120,74 @@ export class WebhookService {
     this.logger.log(`Produto deletado com sucesso: ${product.id}`);
   }
 
-  private async handleSubscriptionCreatedEvent(subscription: Stripe.Subscription) {
+  private async handleSubscriptionCreatedEvent(
+    subscription: Stripe.Subscription
+  ) {
     this.logger.log(`Tratando evento de assinatura criada: ${subscription.id}`);
-    const customer = await this.stripe.customers.retrieve(subscription.customer as string);
-    const user = await this.userService.createUserFromWebhook(customer as Stripe.Customer);
-    const plan = await this.planService.findOneByStripeProductId(subscription.items.data[0].price.product as string);
+    const customer = await this.stripe.customers.retrieve(
+      subscription.customer as string
+    );
+    const user = await this.userService.createUserFromWebhook(
+      customer as Stripe.Customer
+    );
+    const plan = await this.planService.findOneByStripeProductId(
+      subscription.items.data[0].price.product as string
+    );
     await this.userPlanStatusService.createByWebhook(user.id, plan.id);
-    this.logger.log(`Assinatura criada com sucesso para o usuário: ${user.email}`);
+    this.logger.log(
+      `Assinatura criada com sucesso para o usuário: ${user.email}`
+    );
   }
 
   private async handleInvoicePaymentSucceededEvent(invoice: Stripe.Invoice) {
     this.logger.log(`Processando invoice.payment_succeeded: ${invoice.id}`);
-    const subscription = await this.stripe.subscriptions.retrieve(invoice.subscription as string);
-    const customer = await this.stripe.customers.retrieve(invoice.customer as string);
-    const user = await this.userService.findUserByStripeCustomerId(customer.id);
-    const plan = await this.planService.findOneByStripeProductId(subscription.items.data[0].price.product as string);
-    const userPlanStatus = await this.userPlanStatusService.findByUserIdAndPlanId(user.id, plan.id);
+    const subscription = await this.stripe.subscriptions.retrieve(
+      invoice.subscription as string
+    );
+
+    console.log(subscription);
+
+    const customer = await this.stripe.customers.retrieve(
+      invoice.customer as string
+    );
+
+    console.log(customer);
+
+    let user = null;
     
+    user = await this.userService.findUserByStripeCustomerId(customer.id);
+
+    if(!!!user){
+      user = await this.userService.createUserFromWebhook(
+        customer as Stripe.Customer
+      );
+    }
+
+    console.log(user);
+    
+    
+    const plan = await this.planService.findOneByStripeProductId(
+      subscription.items.data[0].price.product as string
+    );
+
+    console.log(plan);
+
+    const userPlanStatus =
+      await this.userPlanStatusService.findByUserIdAndPlanId(user.id, plan.id);
+
+
+    console.log(userPlanStatus);
+
+
+    if(!!!userPlanStatus){
+      await this.userPlanStatusService.createByWebhook(user.id, plan.id);
+    }
+
     await this.userPlanStatusService.updateStatus(userPlanStatus.id, 'active');
-    
-    const resetLink = `${this.configService.get<string>('FRONTEND_URL')}/reset-password?token=${user.id}`;
-    await this.sendEmailService.sendPasswordResetEmail(user.email, resetLink);
+
+    const resetToken = await this.authService.generatePasswordResetToken(user.id);
+    const resetLink = `${this.configService.get<string>('FRONTEND_URL')}/reset-password?token=${resetToken}`; 
+    await this.sendEmailService.sendPasswordResetEmail(user.email, resetLink, user.name);
     this.logger.log(`Email de reset de senha enviado para: ${user.email}`);
   }
 

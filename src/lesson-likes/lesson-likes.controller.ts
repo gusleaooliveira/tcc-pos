@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
@@ -21,6 +22,14 @@ import { LessonLikesService } from './lesson-likes.service';
 @UseGuards(JwtAuthGuard)
 export class LessonLikesController {
   constructor(private readonly lessonLikesService: LessonLikesService) {}
+
+  @Put('/create-or-update')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Create or update a lessonLikes' })
+  async createOrUpdate(@Param() body: CreateLessonLikesDto) {
+    return await this.lessonLikesService.createOrUpdate(body);
+  }
 
   @Post()
   @UseGuards(AuthGuard('jwt'))
@@ -38,6 +47,17 @@ export class LessonLikesController {
     return this.lessonLikesService.findAll();
   }
 
+  @Get('by-user/:lesson_id')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get a specific lessonLikes by ID' })
+  async findOneByLessonIdAndUser(
+    @Param('lesson_id') lesson_id: string,
+    @Query('user_id') user_id: string,
+  ) {
+    return this.lessonLikesService.findOneByLessonIdAndUser(lesson_id, user_id);
+  }
+
   @Get(':id')
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
@@ -52,7 +72,7 @@ export class LessonLikesController {
   @ApiOperation({ summary: 'Update an lessonLikes' })
   update(
     @Param('id') id: string,
-    @Body() updateLessonLikesDto: UpdateLessonLikesDto
+    @Body() updateLessonLikesDto: UpdateLessonLikesDto,
   ) {
     return this.lessonLikesService.update(id, updateLessonLikesDto);
   }

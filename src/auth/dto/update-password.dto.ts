@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, MinLength } from 'class-validator';
 
 export class UpdatePasswordDto {
@@ -6,9 +7,6 @@ export class UpdatePasswordDto {
   oldPassword: string;
 
   @IsString()
-  @MinLength(6, {
-    message: 'The new password must be at least 6 characters long',
-  })
   @IsNotEmpty({ message: 'The new password is required' })
   newPassword: string;
 }

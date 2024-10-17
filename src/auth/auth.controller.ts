@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req, Res } from '@nestjs/common';
+import { Body, Controller, Post, Req, Res, UnauthorizedException } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger'; // Importando Swagger decoradores
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
@@ -24,5 +24,15 @@ export class AuthController {
     @Body() updatePasswordDto: UpdatePasswordDto
   ) {
     return this.authService.changePassword(req.user.id, updatePasswordDto);
+  }
+
+  @Post('reset-password')
+  async resetPassword(@Body() body: { token: string; newPassword: string }) {
+    const success = await this.authService.resetPassword(body.token, body.newPassword);
+    if (success) {
+      return { message: 'Senha redefinida com sucesso' };
+    } else {
+      throw new UnauthorizedException('Token inválido ou expirado');
+    }
   }
 }

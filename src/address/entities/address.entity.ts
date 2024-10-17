@@ -6,25 +6,25 @@ export class Address {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ nullable: true })
   name: string;
 
-  @Column()
+  @Column({ nullable: true })
   cep: string;
 
-  @Column()
+  @Column({ nullable: true })
   country: string;
 
-  @Column()
+  @Column({ nullable: true })
   state: string;
 
-  @Column()
+  @Column({ nullable: true })
   city: string;
 
-  @Column()
+  @Column({ nullable: true })
   neighborhood: string;
 
-  @Column()
+  @Column({ nullable: true })
   street: string;
 
   @Column({ nullable: true })
@@ -35,4 +35,7 @@ export class Address {
 
   @OneToOne(() => User, (user) => user.address)
   user: User;
+
+
+
 }

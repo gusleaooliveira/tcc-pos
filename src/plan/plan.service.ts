@@ -28,19 +28,22 @@ export class PlanService {
       where: { stripeProductId: product.id },
     });
 
-    if (!plan) {
+    if (!!!plan) {
       plan = this.planRepository.create({
-        stripeProductId: product.id,
-        name: product.name,
-        description: product.description,
-        price: 0, // Definir um valor padrão ou null se a coluna permitir
+        stripeProductId: product.id ,
+        name: product.name ? product.name : null,
+        description: product.description ? product.description : null,
+        price: product.metadata.price ? Number(product.metadata.price) : 0, // Definir um valor padrão ou null se a coluna permitir
       });
+      return await this.planRepository.save(plan);
     } else {
       plan.name = product.name;
       plan.description = product.description;
+      plan.price = product.metadata.price ? Number(product.metadata.price) : 0;
+      return await this.planRepository.save(plan);
     }
 
-    return await this.planRepository.save(plan);
+    
   }
 
  

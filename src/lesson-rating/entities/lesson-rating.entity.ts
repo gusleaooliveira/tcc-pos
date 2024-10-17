@@ -15,11 +15,11 @@ export class LessonRating {
   id: string;
 
   @ManyToOne(() => Lesson, (lesson) => lesson.lesson_rating)
-  @JoinColumn({ name: 'lesson_id' })
+  // @JoinColumn({ name: 'lesson_id' })
   lesson_id: Lesson;
 
   @ManyToOne(() => User, (user) => user.lesson_rating)
-  @JoinColumn({ name: 'user_id' })
+  // @JoinColumn({ name: 'user_id' })
   user_id: User;
 
   @Column({ nullable: true, generated: 'increment' })

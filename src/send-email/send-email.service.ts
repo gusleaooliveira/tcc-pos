@@ -74,13 +74,46 @@ export class SendEmailService {
   }
 
 
-  async sendPasswordResetEmail(email: string, resetLink: string) {
+  async sendPasswordResetEmail(email: string, resetLink: string, userName: string) {
+
     await this.mailerService.sendMail({
       to: email,
-      subject: 'Redefinição de senha',
-      text: `Clique no link a seguir para redefinir sua senha: ${resetLink}`,
-      html: `<p>Clique no link a seguir para redefinir sua senha: <a href="${resetLink}">${resetLink}</a></p>`,
+      subject: 'Seja bem-vindo!',
+      template: 'payment-confirmation',
+      context: {
+        userName: userName,
+        linkPassword: resetLink,
+      },
+      attachments: [
+        {
+          filename: 'logo.png',
+          path: join(__dirname, 'templates', 'assets', 'logo.png'),
+          cid: 'logo',
+        },
+        {
+          filename: 'instagram-icon.png',
+          path: join(__dirname, 'templates', 'assets', 'instagram-icon.png'),
+          cid: 'instagram-icon',
+        },
+        {
+          filename: 'youtube-icon.png',
+          path: join(__dirname, 'templates', 'assets', 'youtube-icon.png'),
+          cid: 'youtube-icon',
+        },
+        {
+          filename: 'linkedin-icon.png',
+          path: join(__dirname, 'templates', 'assets', 'linkedin-icon.png'),
+          cid: 'linkedin-icon',
+        },
+        {
+          filename: 'facebook-icon.png',
+          path: join(__dirname, 'templates', 'assets', 'facebook-icon.png'),
+          cid: 'facebook-icon',
+        },
+      ],
     });
+
+   
   }
 
   // Envio de email de criação de conta

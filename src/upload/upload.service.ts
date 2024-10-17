@@ -9,6 +9,9 @@ import { VideoService } from 'src/video/video.service';
 
 @Injectable()
 export class UploadService {
+  findCreateDefault() {
+    throw new Error('Method not implemented.');
+  }
   private s3Client: S3Client;
 
   constructor(

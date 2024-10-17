@@ -21,15 +21,38 @@ export class LessonLikesService {
     private readonly userService: UserService,
 
     @Inject(forwardRef(() => LessonService))
-    private readonly lessonService: LessonService
+    private readonly lessonService: LessonService,
   ) {}
 
+  async createOrUpdate(body: CreateLessonLikesDto) {
+    const { lesson_id, user_id, is_liked } = body;
+    const lessonLikes = await this.lessonLikesRepository
+      .createQueryBuilder('lesson_likes')
+      .where('lesson_likes.lesson_id = :lesson_id', { lesson_id })
+      .andWhere('lesson_likes.user_id = :user_id', { user_id })
+      .getOne();
+
+    if (lessonLikes) {
+      return await this.update(lessonLikes.id, {
+        user_id,
+        lesson_id,
+        is_liked,
+      });
+    }
+
+    return await this.create({
+      user_id,
+      lesson_id,
+      is_liked,
+    });
+  }
+
   async create(
-    createLessonLikesDto: CreateLessonLikesDto
+    createLessonLikesDto: CreateLessonLikesDto,
   ): Promise<LessonLikes> {
     const user = await this.userService.findOne(createLessonLikesDto.user_id);
     const lesson = await this.lessonService.findOne(
-      createLessonLikesDto.lesson_id
+      createLessonLikesDto.lesson_id,
     );
 
     const data = {
@@ -63,6 +86,16 @@ export class LessonLikesService {
     return lessonLikes;
   }
 
+  async findOneByLessonIdAndUser(lesson_id: string, user_id: string) {
+    const lessonRating = await this.lessonLikesRepository
+      .createQueryBuilder('lesson_likes')
+      .leftJoinAndSelect('lesson_likes.user_id', 'user_id')
+      .where('lesson_likes.lesson_id = :lesson_id', { lesson_id })
+      .andWhere('lesson_likes.user_id = :user_id', { user_id })
+      .getOne();
+    return lessonRating;
+  }
+
   async findByLessonAndCount(lesson_id: string) {
     const lessonRating = await this.lessonLikesRepository
       .createQueryBuilder('lesson_likes')
@@ -71,22 +104,18 @@ export class LessonLikesService {
     return lessonRating;
   }
 
-  async update(
-    id: string,
-    updateLessonLikesDto: UpdateLessonLikesDto
-  ): Promise<LessonLikes> {
-    const user = await this.userService.findOne(updateLessonLikesDto.user_id);
-    const lesson = await this.lessonService.findOne(
-      updateLessonLikesDto.lesson_id
-    );
+  async findByLessonAndUser(lesson_id: string, user_id: string) {
+    const lessonRating = await this.lessonLikesRepository
+      .createQueryBuilder('lesson_likes')
+      .leftJoinAndSelect('lesson_likes.user_id', 'user_id')
+      .where('lesson_likes.lesson_id = :lesson_id', { lesson_id })
+      .andWhere('lesson_likes.user_id = :user_id', { user_id })
+      .getOne();
+    return lessonRating;
+  }
 
-    const data = {
-      ...updateLessonLikesDto,
-      user_id: user,
-      lesson_id: lesson,
-    };
-
-    await this.lessonLikesRepository.update(id, data);
+  async update(id: string, updateLessonLikesDto: any): Promise<LessonLikes> {
+    await this.lessonLikesRepository.update({ id }, updateLessonLikesDto);
     const updatedLessonLikes = await this.findOne(id);
     return updatedLessonLikes;
   }

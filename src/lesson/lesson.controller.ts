@@ -7,6 +7,7 @@ import {
   Post,
   Put,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -42,8 +43,14 @@ export class LessonController {
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get a specific lesson by ID' })
-  findOne(@Param('id') id: string) {
-    return this.lessonService.findOne(id);
+  findOne(
+    @Param('id') id: string,
+    @Query()
+    queries: {
+      user_id: string;
+    },
+  ) {
+    return this.lessonService.findOneToFront(id, queries);
   }
 
   @Put(':id')

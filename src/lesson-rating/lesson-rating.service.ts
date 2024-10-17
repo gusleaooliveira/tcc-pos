@@ -21,15 +21,15 @@ export class LessonRatingService {
     private readonly userService: UserService,
 
     @Inject(forwardRef(() => LessonService))
-    private readonly lessonService: LessonService
+    private readonly lessonService: LessonService,
   ) {}
 
   async create(
-    createLessonRatingDto: CreateLessonRatingDto
+    createLessonRatingDto: CreateLessonRatingDto,
   ): Promise<LessonRating> {
     const user = await this.userService.findOne(createLessonRatingDto.user_id);
     const lesson = await this.lessonService.findOne(
-      createLessonRatingDto.lesson_id
+      createLessonRatingDto.lesson_id,
     );
 
     const data = {
@@ -72,13 +72,23 @@ export class LessonRatingService {
     return lessonRating;
   }
 
+  async findByLessonAndUser(lesson_id: string, user_id: string) {
+    const lessonRating = await this.lessonRatingRepository
+      .createQueryBuilder('lesson_rating')
+      .leftJoinAndSelect('lesson_rating.user_id', 'user')
+      .where('lesson_rating.lesson_id = :lesson_id', { lesson_id })
+      .andWhere('lesson_rating.user_id = :user_id', { user_id })
+      .getMany();
+    return lessonRating;
+  }
+
   async update(
     id: string,
-    updateLessonRatingDto: UpdateLessonRatingDto
+    updateLessonRatingDto: UpdateLessonRatingDto,
   ): Promise<LessonRating> {
     const user = await this.userService.findOne(updateLessonRatingDto.user_id);
     const lesson = await this.lessonService.findOne(
-      updateLessonRatingDto.lesson_id
+      updateLessonRatingDto.lesson_id,
     );
 
     const data = {

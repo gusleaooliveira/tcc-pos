@@ -46,6 +46,16 @@ export class ModuleController {
     return this.moduleService.findAll();
   }
 
+  @Get('to-lesson/:id')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get all lessons by module ID' })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  async findAllLessonsByModuleId(@Param('id') id: string) {
+    return this.moduleService.findAllLessonsByModuleId(id);
+  }
+
   @Get(':id')
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
