@@ -1,5 +1,6 @@
 'use client';
 import '@mantine/core/styles.css';
+import '@mantine/tiptap/styles.css';
 import 'react-toastify/dist/ReactToastify.css';
 import { ColorSchemeScript, createTheme, MantineProvider } from '@mantine/core';
 import Head from 'next/head';

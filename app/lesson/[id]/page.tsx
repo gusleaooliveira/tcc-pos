@@ -87,12 +87,14 @@ export default function Lesson({ params }: Props) {
       lesson_id: string;
       is_liked: boolean;
     }) => {
+      console.log('data:', data);
+
       const response = await api.put('/lessons-likes/create-or-update', data);
       return response.data;
     },
     onSuccess: (response) => {
-      toast.success('Like enviado com sucesso');
       refetchLike();
+      toast.success('Like enviado com sucesso');
       queryClient.invalidateQueries({ queryKey: ['lessons-likes'] });
     },
     onError: () => {
@@ -273,7 +275,7 @@ export default function Lesson({ params }: Props) {
               </Text>
             </Box>
             <Box>
-              {like?.is_liked ? 'Curtido' : 'Curtir'}
+              {like?.is_liked ? 'Curtido ' : 'Curtir '}
 
               <ActionIcon
                 onClick={() => {
@@ -282,7 +284,6 @@ export default function Lesson({ params }: Props) {
                     lesson_id: params?.id,
                     is_liked: !like?.is_liked,
                   });
-                  refetchLike();
                 }}
               >
                 {isLoadingLike ? (
@@ -558,16 +559,17 @@ export default function Lesson({ params }: Props) {
                   }}
                 >
                   <Box>
-                  {lesson?.miniature?.url ? (
-                    <Image
-                      src={lesson?.miniature?.url}
-                      width={134}
-                      height={127}
-                      alt="thumbnail"
-                    />
-                  ) : (
-                    <IconFile />
-                  )}
+                    {lesson?.miniature?.url ? (
+                      <Image
+                        src={lesson?.miniature?.url}
+                        width={134}
+                        height={127}
+                        style={{ borderRadius: 8 }}
+                        alt="thumbnail"
+                      />
+                    ) : (
+                      <IconFile />
+                    )}
                   </Box>
                   <Box
                     style={{
@@ -611,12 +613,16 @@ export default function Lesson({ params }: Props) {
                       }}
                     >
                       <Text>{formatVideoTime(lesson.duration)}</Text>
-                      {lesson?.lession_progress?.percentage_completed ? 
-                      <>
-                        <IconPointFilled style={{ width: 8, height: 8 }} />  
-                        <Text>{lesson?.lession_progress?.percentage_completed}%</Text>
-                      </>
-                      : ''}
+                      {lesson?.lession_progress?.percentage_completed ? (
+                        <>
+                          <IconPointFilled style={{ width: 8, height: 8 }} />
+                          <Text>
+                            {lesson?.lession_progress?.percentage_completed}%
+                          </Text>
+                        </>
+                      ) : (
+                        ''
+                      )}
                     </Box>
                   </Box>
                 </Box>

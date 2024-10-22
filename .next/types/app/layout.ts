@@ -1,4 +1,4 @@
-// File: /home/gustavo/projetos/tcc-pos/app/layout.tsx
+// File: /home/gustavo/tcc/tcc-pos/tcc-pos/app/layout.tsx
 import * as entry from '../../../app/layout.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
