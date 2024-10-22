@@ -63,9 +63,12 @@ export class LessonGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('updateLessonProgress')
   async handleUpdateLessonProgress(client: Socket, @MessageBody() data: any) {
-    this.lessonProgressService.createOrUpdate(data);
-    const { time } = data;
-    this.server.emit('updateLessonProgressResponse', `Tempo: ${time}`);
+    const dt = await this.lessonProgressService.createOrUpdate(data);
+    
+
+    this.server.emit(
+      'updateLessonProgressResponse', 
+      `Tempo: ${dt.time} | Lesson: ${dt.lesson_id.id} | User: ${dt.user_id.id} | Percentage: ${dt.percentage_completed}`);
   }
 
   @SubscribeMessage('updateLessonProgressResponse')

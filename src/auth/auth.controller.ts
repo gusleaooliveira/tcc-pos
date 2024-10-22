@@ -3,6 +3,7 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger'; // Importando Swagger d
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
+import { ResetDto } from './dto/reset.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -17,6 +18,20 @@ export class AuthController {
     return await this.authService.login(body, res);
   }
 
+  @Post('reset-password')
+  async resetPassword(@Body() body: ResetDto) {
+    console.log(body);
+    
+    const success = await this.authService.resetPassword(body.token, body.new_password);
+
+    if (success) {
+      return { message: 'Senha redefinida com sucesso' };
+    } else {
+      throw new UnauthorizedException('Token inválido ou expirado');
+    }
+  }
+
+  
   @Post('change-password')
   @ApiOperation({ summary: 'Troca de senha do usuário' })
   async changePassword(
@@ -26,13 +41,5 @@ export class AuthController {
     return this.authService.changePassword(req.user.id, updatePasswordDto);
   }
 
-  @Post('reset-password')
-  async resetPassword(@Body() body: { token: string; newPassword: string }) {
-    const success = await this.authService.resetPassword(body.token, body.newPassword);
-    if (success) {
-      return { message: 'Senha redefinida com sucesso' };
-    } else {
-      throw new UnauthorizedException('Token inválido ou expirado');
-    }
-  }
+  
 }

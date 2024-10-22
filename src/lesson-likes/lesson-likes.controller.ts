@@ -27,7 +27,7 @@ export class LessonLikesController {
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create or update a lessonLikes' })
-  async createOrUpdate(@Param() body: CreateLessonLikesDto) {
+  async createOrUpdate(@Body() body: CreateLessonLikesDto) {
     return await this.lessonLikesService.createOrUpdate(body);
   }
 
@@ -35,8 +35,8 @@ export class LessonLikesController {
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a new lessonLikes' })
-  create(@Body() createLessonLikesDto: CreateLessonLikesDto) {
-    return this.lessonLikesService.create(createLessonLikesDto);
+  async create(@Body() createLessonLikesDto: CreateLessonLikesDto) {
+    return await this.lessonLikesService.create(createLessonLikesDto);
   }
 
   @Get()

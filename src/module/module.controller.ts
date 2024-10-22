@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
@@ -32,7 +33,9 @@ export class ModuleController {
 
   @Get('/home')
   @ApiOperation({ summary: 'Get all modules for home' })
-  findAllForHome() {
+  findAllForHome(
+    
+  ) {
     return this.moduleService.findAllForHome();
   }
 
@@ -42,7 +45,9 @@ export class ModuleController {
   @ApiOperation({ summary: 'Get all modulees' })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  findAll() {
+  findAll(
+   
+  ) {
     return this.moduleService.findAll();
   }
 

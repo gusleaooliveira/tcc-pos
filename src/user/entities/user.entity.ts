@@ -40,9 +40,11 @@ export class User {
   @Column({ nullable: true })
   description: string;
 
+ 
   @Column({ nullable: true })
   cpf: string;
 
+ 
   @Column({ nullable: true, default: null })
   gender: string;
 

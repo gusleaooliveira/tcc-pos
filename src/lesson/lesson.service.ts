@@ -264,12 +264,15 @@ export class LessonService {
       .where('lesson.id = :id', { id })
       .getOne();
 
-    await this.imageService.remove(lesson.thumbnail.id);
-    await this.imageService.remove(lesson.miniature.id);
-    await this.documentService.removeMany(
-      lesson.complementary_materials.map((material) => material.id),
-    );
-    await this.videoService.remove(lesson.video.id);
+    if (lesson?.thumbnail?.id)
+      await this.imageService.remove(lesson.thumbnail.id);
+    if (lesson?.miniature?.id)
+      await this.imageService.remove(lesson.miniature.id);
+    if (lesson?.complementary_materials)
+      await this.documentService.removeMany(
+        lesson.complementary_materials.map((material) => material.id),
+      );
+    if (lesson?.video?.id) await this.videoService.remove(lesson.video.id);
 
     const result = await this.lessonRepository.delete(id);
     if (result.affected === 0) {

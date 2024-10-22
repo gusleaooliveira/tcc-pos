@@ -25,44 +25,52 @@ export class LessonLikesService {
   ) {}
 
   async createOrUpdate(body: CreateLessonLikesDto) {
-    const { lesson_id, user_id, is_liked } = body;
+    console.log('body:', body);
+
     const lessonLikes = await this.lessonLikesRepository
       .createQueryBuilder('lesson_likes')
-      .where('lesson_likes.lesson_id = :lesson_id', { lesson_id })
-      .andWhere('lesson_likes.user_id = :user_id', { user_id })
+      .where('lesson_likes.lesson_id = :lesson_id', {
+        lesson_id: body.lesson_id,
+      })
+      .andWhere('lesson_likes.user_id = :user_id', { user_id: body.user_id })
       .getOne();
 
-    if (lessonLikes) {
-      return await this.update(lessonLikes.id, {
-        user_id,
-        lesson_id,
-        is_liked,
+    console.log('lessonLikes:', lessonLikes);
+
+    let response: any;
+
+    if (!!lessonLikes) {
+      response = await this.update(lessonLikes.id, {
+        user_id: body.user_id,
+        lesson_id: body.lesson_id,
+        is_liked: body.is_liked,
+      });
+    } else {
+      response = await this.create({
+        user_id: body.user_id,
+        lesson_id: body.lesson_id,
+        is_liked: body.is_liked,
       });
     }
 
-    return await this.create({
-      user_id,
-      lesson_id,
-      is_liked,
-    });
+    console.log('response:', response);
+
+    return response;
   }
 
   async create(
     createLessonLikesDto: CreateLessonLikesDto,
   ): Promise<LessonLikes> {
-    const user = await this.userService.findOne(createLessonLikesDto.user_id);
-    const lesson = await this.lessonService.findOne(
-      createLessonLikesDto.lesson_id,
-    );
-
-    const data = {
-      ...createLessonLikesDto,
-      user_id: user,
-      lesson_id: lesson,
+    const data: any = {
+      user_id: createLessonLikesDto.user_id,
+      lesson_id: createLessonLikesDto.lesson_id,
+      is_liked: createLessonLikesDto.is_liked,
     };
 
-    const lessonLikes = this.lessonLikesRepository.create(data);
-    return await this.lessonLikesRepository.save(lessonLikes);
+    const lessonLikes = await this.lessonLikesRepository.create(data);
+    const savedLessonLikes: any =
+      await this.lessonLikesRepository.save(lessonLikes);
+    return savedLessonLikes;
   }
 
   async findAll(): Promise<LessonLikes[]> {
@@ -93,6 +101,8 @@ export class LessonLikesService {
       .where('lesson_likes.lesson_id = :lesson_id', { lesson_id })
       .andWhere('lesson_likes.user_id = :user_id', { user_id })
       .getOne();
+
+    console.log('aqui:', lessonRating);
     return lessonRating;
   }
 

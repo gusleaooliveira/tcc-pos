@@ -73,7 +73,7 @@ export class Lesson {
   @Column()
   order: number;
 
-  @Column()
+  @Column({ type: 'float', default: 0 })
   duration: number;
 
   @Column({ default: true })

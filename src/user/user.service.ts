@@ -19,8 +19,10 @@ import { ImageService } from 'src/image/image.service';
 import Stripe from 'stripe';
 import { UploadService } from 'src/upload/upload.service';
 import { UpdateNewPasswordDto } from 'src/auth/dto/update-auth-new.dto';
+
 @Injectable()
 export class UserService {
+  
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
@@ -63,7 +65,6 @@ export class UserService {
         gender: '',
         avatar: null,
         address: {
-          name: null,
           cep: customer.address.postal_code,
           country: customer.address.country,
           state: customer.address.state,
@@ -71,7 +72,8 @@ export class UserService {
           neighborhood: null,
           street: customer.address.line1,
           complement: customer.address.line2,
-          number: null,
+          number: '',
+          name: '',
         },
         social_media: {
           instagram: '',
@@ -160,6 +162,18 @@ export class UserService {
   }
 
   async findOneByEmailAndValidatePassword(email: string, pass: string) {
+    const userTest = await this.userRepository
+      .createQueryBuilder('user') 
+      .where('user.email = :email', { email })
+      .getOne();
+
+    console.log(pass, userTest.password);
+
+    if (!userTest) {
+      return null;
+    }
+    const isPasswordValid = await bcrypt.compare(pass, userTest.password);
+
     const user = await this.userRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.avatar', 'avatar')
@@ -168,12 +182,8 @@ export class UserService {
       .where('user.email = :email', { email })
       .getOne();
 
-    console.log(user);
 
-    if (!user) {
-      return null;
-    }
-    const isPasswordValid = await bcrypt.compare(pass, user.password);
+
     if (!isPasswordValid) {
       return null;
     }
@@ -210,9 +220,11 @@ export class UserService {
       throw new NotFoundException('Usuário não encontrado');
     }
 
-    user.password = await bcrypt.hash(updateNewPasswordDto.password, 10);
-    user.is_first_login = false;
-    return this.userRepository.save(user);
+    console.log(updateNewPasswordDto.password);
+    
+    const password = await bcrypt.hash(updateNewPasswordDto.password, 10); 
+    await this.userRepository.update(id, {...user, is_first_login :false, password: password });
+    return await this.findOne(id);
   }
 
   async updatePassword(
@@ -237,6 +249,23 @@ export class UserService {
     user.password = await bcrypt.hash(updatePasswordDto.newPassword, 10);
     user.is_first_login = false;
     return this.userRepository.save(user);
+  }
+
+  async findUserByStripeCustomerIdOrEmail(stripeCustomerId: string): Promise<User | null> {
+    let customer = await this.findUserByStripeCustomerId(stripeCustomerId);
+    
+    const user = await this.userRepository
+    .createQueryBuilder('user')
+    .where('user.stripe_customer_id = :stripeCustomerId', {
+      stripeCustomerId,
+    })
+    .orWhere('user.email = :email', { email: customer.email })
+    .getOne();
+
+  console.log('user encontrado:');
+  console.log(user);
+
+  return user;
   }
 
   async findUserByStripeCustomerId(
@@ -334,22 +363,41 @@ export class UserService {
   }
 
   async savePasswordResetToken(userId: string, token: string): Promise<void> {
+    const userOld = await this.userRepository.createQueryBuilder('user')
+    .where('user.id = :userId', { userId })
+    .getOne();
     await this.userRepository.update(
       { id: userId },
-      { passwordResetToken: token },
+      { ...userOld, passwordResetToken: token },
     );
+    const user = await this.userRepository.createQueryBuilder('user')
+    .where('user.id = :userId', { userId })
+    .getOne();
+    console.log(user);
   }
 
   async findUserByResetToken(token: string): Promise<User | null> {
-    return this.userRepository.findOne({
-      where: { passwordResetToken: token },
-    });
+    const user = await this.userRepository.createQueryBuilder('user')
+    .where('user.passwordResetToken = :token', { token })
+    .getOne();
+        
+    console.log(user);
+    return user;
   }
 
-  async clearPasswordResetToken(userId: string): Promise<void> {
+  async clearPasswordResetToken(userId: string): Promise<void> { 
+    const user = await this.userRepository.createQueryBuilder('user')
+    .where('user.id = :userId', { userId })
+    .getOne();
+      
     await this.userRepository.update(
       { id: userId },
-      { passwordResetToken: null },
+      { ...user, passwordResetToken: null },
     );
+
+    const userUpdated = await this.userRepository.createQueryBuilder('user')
+    .where('user.id = :userId', { userId })
+    .getOne();
+    console.log(userUpdated);
   }
 }

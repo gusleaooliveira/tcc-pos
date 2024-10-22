@@ -92,6 +92,7 @@ export class WebhookService {
       }
       this.logger.log(`Evento ${event.type} processado com sucesso`);
     } catch (error) {
+      console.log(error);
       this.logger.error(
         `Erro ao processar evento ${event.type}: ${error.message}`
       );
@@ -155,8 +156,14 @@ export class WebhookService {
 
     let user = null;
     
-    user = await this.userService.findUserByStripeCustomerId(customer.id);
+    user = await this.userService.findUserByStripeCustomerIdOrEmail(customer.id);
 
+    const resetToken = await this.authService.generatePasswordResetToken(user.id);
+    const resetLink = `${this.configService.get<string>('FRONTEND_URL')}/autenticacao/criar-senha?token=${resetToken}`;
+
+    user.passwordResetToken = resetToken;
+
+    
     if(!!!user){
       user = await this.userService.createUserFromWebhook(
         customer as Stripe.Customer
@@ -178,15 +185,18 @@ export class WebhookService {
 
     console.log(userPlanStatus);
 
-
+    
     if(!!!userPlanStatus){
       await this.userPlanStatusService.createByWebhook(user.id, plan.id);
     }
 
     await this.userPlanStatusService.updateStatus(userPlanStatus.id, 'active');
 
-    const resetToken = await this.authService.generatePasswordResetToken(user.id);
-    const resetLink = `${this.configService.get<string>('FRONTEND_URL')}/reset-password?token=${resetToken}`; 
+     
+    
+    console.log('resetLink:', resetLink);
+    
+    
     await this.sendEmailService.sendPasswordResetEmail(user.email, resetLink, user.name);
     this.logger.log(`Email de reset de senha enviado para: ${user.email}`);
   }

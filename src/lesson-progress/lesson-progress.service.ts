@@ -30,15 +30,23 @@ export class LessonProgressService {
       createLessonProgressDto.user_id,
     );
 
+
     if (!!lesson) {
+      const percentage = createLessonProgressDto.time <= lesson.lesson_id.duration ? Math.round((createLessonProgressDto.time / lesson.lesson_id.duration) * 100) : 100;
       const data = {
         ...lesson,
         time: createLessonProgressDto.time,
+        percentage_completed: percentage,
       };
       await this.update(lesson.id, data);
     } else {
       await this.create(createLessonProgressDto);
     }
+
+    return  await this.findOneByLessonAndUser(
+      createLessonProgressDto.lesson_id,
+      createLessonProgressDto.user_id,
+    );
   }
 
   async findOneByLesson(lesson_id: string) {
@@ -60,13 +68,8 @@ export class LessonProgressService {
       .createQueryBuilder('lesson_progress')
       .leftJoinAndSelect('lesson_progress.lesson_id', 'lesson_id')
       .leftJoinAndSelect('lesson_progress.user_id', 'user_id')
-      .where(
-        'lesson_progress.lesson_id = :lesson_id AND lesson_progress.user_id = :user_id',
-        {
-          lesson_id,
-          user_id,
-        },
-      )
+      .where('lesson_progress.lesson_id = :lesson_id', {lesson_id})
+      .andWhere('lesson_progress.user_id = :user_id', {user_id}) 
       .getOne();
 
     return response;

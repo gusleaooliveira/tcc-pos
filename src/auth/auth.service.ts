@@ -4,6 +4,7 @@ import { UserService } from 'src/user/user.service';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { v4 as uuidv4 } from 'uuid';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -22,7 +23,9 @@ export class AuthService {
     const user = await this.userService.findUserByResetToken(token);
     if (!user) {
       return false;
-    }
+    } 
+ 
+
     await this.userService.updatePasswordToReset(user.id, {
       password: newPassword,
     });

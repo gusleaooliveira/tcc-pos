@@ -24,45 +24,7 @@ export class SendEmailService {
     }
   }
 
-  // Envio de email de confirmação de pagamento
-  async sendPaymentConfirmationEmail(to: string, data: any) {
-    await this.mailerService.sendMail({
-      to,
-      subject: 'Seja bem-vindo!',
-      template: 'payment-confirmation',
-      context: {
-        userName: data.userName,
-        linkPassword: data.linkPassword,
-      },
-      attachments: [
-        {
-          filename: 'logo.png',
-          path: join(__dirname, 'templates', 'assets', 'logo.png'),
-          cid: 'logo',
-        },
-        {
-          filename: 'instagram-icon.png',
-          path: join(__dirname, 'templates', 'assets', 'instagram-icon.png'),
-          cid: 'instagram-icon',
-        },
-        {
-          filename: 'youtube-icon.png',
-          path: join(__dirname, 'templates', 'assets', 'youtube-icon.png'),
-          cid: 'youtube-icon',
-        },
-        {
-          filename: 'linkedin-icon.png',
-          path: join(__dirname, 'templates', 'assets', 'linkedin-icon.png'),
-          cid: 'linkedin-icon',
-        },
-        {
-          filename: 'facebook-icon.png',
-          path: join(__dirname, 'templates', 'assets', 'facebook-icon.png'),
-          cid: 'facebook-icon',
-        },
-      ],
-    });
-  }
+  
 
   async sendSubscriptionUpdatedEmail(to: string, data: any) {
     await this.mailerService.sendMail({

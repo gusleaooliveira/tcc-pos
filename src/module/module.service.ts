@@ -5,6 +5,7 @@ import { CreateModuleDto } from './dto/create-module.dto';
 import { UpdateModuleDto } from './dto/update-module.dto';
 import { Module } from './entities/module.entity';
 import { LessonService } from 'src/lesson/lesson.service';
+import { LessonProgressService } from 'src/lesson-progress/lesson-progress.service';
 
 @Injectable()
 export class ModuleService {
@@ -12,6 +13,7 @@ export class ModuleService {
     @InjectRepository(Module)
     private readonly moduleRepository: Repository<Module>,
     private readonly lessonService: LessonService,
+    private readonly lessonProgressService: LessonProgressService,
   ) {}
 
   async create(createModuleDto: CreateModuleDto): Promise<Module> {
@@ -98,9 +100,16 @@ export class ModuleService {
       )
       .where('module.id = :id', { id })
       .getOne();
-    if (!module) {
-      throw new NotFoundException(`Module with ID ${id} not found`);
-    }
+
+    await Promise.all(
+      module.lessons.map(async (lesson, index) => {
+        const progress: any = await this.lessonProgressService.findOneByLesson(
+          lesson.id,
+        );
+        module.lessons[index]['lession_progress'] = progress;
+      }),
+    );
+
     return module;
   }
 
