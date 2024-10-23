@@ -1,17 +1,26 @@
 /** @type {import('next').NextConfig} */
+
 const nextConfig = {
-  images: {
-    dangerouslyAllowSVG: true,
-    contentDispositionType: 'attachment',
-    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'darcio-flix-api-production.up.railway.app',
-        port: '',
-        pathname: '/image/**',
+  webpack(config, options) {
+    config.module.rules.push({
+      test: /\.(mp4|webm|ogg|swf|ogv)$/,
+      use: {
+        loader: "file-loader",
+        options: {
+          publicPath: "/_next/static/videos/",
+          outputPath: "static/videos/",
+          name: "[name].[hash].[ext]",
+          esModule: false,
+        },
       },
-    ],
+    });
+
+    return config;
+  },
+  images: {
+    domains: ["darcio-flix-api-production.up.railway.app"],
+    dangerouslyAllowSVG: true,
+    // Somente o domínio
   },
 };
 

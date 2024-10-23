@@ -1,4 +1,4 @@
-// File: /home/gustavo/tcc/tcc-pos/tcc-pos/app/home/page.tsx
+// File: /home/gustavo/projetos/tcc-pos/app/home/page.tsx
 import * as entry from '../../../../app/home/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

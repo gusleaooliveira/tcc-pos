@@ -1,0 +1,15 @@
+.textVip {
+  background-image: linear-gradient(
+    135deg,
+    #693e07 2.38%,
+    #855211 9.26%,
+    #b57310 21.81%,
+    #f8d166 45.29%,
+    #cca11e 56.21%,
+    #eac84f 70.38%,
+    #bb760c 80.9%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
